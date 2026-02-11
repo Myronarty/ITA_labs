@@ -2,7 +2,7 @@
 
 int main()
 {
-	Code64("C:/Users/Anush/Desktop/problems/im1.png", "");
+	Code64("D:/problems/im1.png", "");
 
 	return 0;
 }
