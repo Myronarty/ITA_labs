@@ -2,8 +2,8 @@
 
 int main()
 {
-	Code64("D:/problems/term_6/ITA/lab_1/test_subjects/im1.png", "");
-	deCode64("D:/problems/term_6/ITA/lab_1/test_subjects/im1.png.base64", "D:/problems/term_6/ITA/lab_1/test_subjects/ime87.png");
+	//Code64("D:/problems/term_6/ITA/lab_1/test_subjects/im2.jpg", "");
+	deCode64("D:/problems/term_6/ITA/lab_1/test_subjects/im2.jpg.base64", "D:/problems/term_6/ITA/lab_1/test_subjects/im2_.jpg");
 
 	return 0;
 }

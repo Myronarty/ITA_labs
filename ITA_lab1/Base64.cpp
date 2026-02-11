@@ -14,6 +14,7 @@ int GetIndex(char c)
     if (c >= '0' && c <= '9') return c - '0' + 52;
     if (c == '+') return 62;
     if (c == '/') return 63;
+    if (c == '-') return 65;
     return 64;
 }
 
@@ -161,8 +162,31 @@ void deCode64(string name_encode, string name_rez)
     x.reserve(new_size);
 
     int s = 0;
-    for (int i = 0; i < size; i += 4)
+    for (uint64_t i = 0; i < size; i += 4)
     {
+        //cout << i << endl;
+        //comments
+        if (y[i] == '-')
+        {
+            int k = 1;
+            while (y[i + k] != '\n' || i + k >= size)
+            {
+                cout << k << " __ " << endl;
+                if (k > 75)
+                {
+                    cerr << "Too big comment" << endl;
+                    break;
+                }
+                if (y[i + k] == '-')
+                {
+                    cerr << "invalid input character__" << endl;
+                    break;
+                }
+                k++;
+            }
+            i += k-3; //невілюємо стрибок на 4 вперед
+            continue;
+        }
         //errors
         for (int e = 0; e < 4; e++)
         {
@@ -170,39 +194,19 @@ void deCode64(string name_encode, string name_rez)
             {
                 if (y[i + e] != '=')
                 {
-                    cerr << "line:" << s << " char: " << i % 76 << " invalid input character: (" << y[i + e] << ")";
+                    cerr << "line:" << s / 19 << " char: " << i % 76 << " invalid input character: (" << y[i + e] << ")";
                     return;
                 }
                 else if (i+e < size - 2)
                 {
-                    cerr << "line:" << s << " char: " << i % 76 << " incorrect use of padding";
+                    cerr << "line:" << s / 19 << " char: " << i % 76 << " incorrect use of padding";
                     return;
                 }
                 else if ((y[i + e] == '\n') && ((s % 19) != 0))
                 {
-                    cerr << "line: " << s << "incorrect string length: (" << i % 76 << ")";
+                    cerr << "line: " << s / 19 << "incorrect string length: (" << i % 76 << ")";
                 }
             }
-        }
-
-        if (y[i] == '-')
-        {
-            int k = 0;
-            while (y[i + k] != '\n' || i+k >= size)
-            {
-                k++;
-                if (k > 75)
-                {
-                    cerr << "Too big comment";
-                    break;
-                }
-                if (y[i + k] == '-')
-                {
-                    cerr << "invalid input character";
-                    break;
-                }
-            }
-            i += k;
         }
 
         x.push_back((GetIndex(y[i]) << 2) ^ (GetIndex(y[i + 1]) >> 4));
