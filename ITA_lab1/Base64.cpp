@@ -14,7 +14,7 @@ int GetIndex(char c)
     if (c >= '0' && c <= '9') return c - '0' + 52;
     if (c == '+') return 62;
     if (c == '/') return 63;
-    return 0;
+    return 64;
 }
 
 void Code64(string name_orig, string name_encode)
@@ -141,11 +141,6 @@ void deCode64(string name_encode, string name_rez)
     streamsize size = file.tellg();
     file.seekg(0, ios::beg);
 
-    /*if ((size & 3) > 0)
-    {
-        cerr << "the file is damaged" << endl;
-    }*/
-
     // 3. Створюємо буфер потрібного розміру
     vector<char> y(size);
 
@@ -168,6 +163,48 @@ void deCode64(string name_encode, string name_rez)
     int s = 0;
     for (int i = 0; i < size; i += 4)
     {
+        //errors
+        for (int e = 0; e < 4; e++)
+        {
+            if (GetIndex(y[i+e]) == 64)
+            {
+                if (y[i + e] != '=')
+                {
+                    cerr << "line:" << s << " char: " << i % 76 << " invalid input character: (" << y[i + e] << ")";
+                    return;
+                }
+                else if (i+e < size - 2)
+                {
+                    cerr << "line:" << s << " char: " << i % 76 << " incorrect use of padding";
+                    return;
+                }
+                else if ((y[i + e] == '\n') && ((s % 19) != 0))
+                {
+                    cerr << "line: " << s << "incorrect string length: (" << i % 76 << ")";
+                }
+            }
+        }
+
+        if (y[i] == '-')
+        {
+            int k = 0;
+            while (y[i + k] != '\n' || i+k >= size)
+            {
+                k++;
+                if (k > 75)
+                {
+                    cerr << "Too big comment";
+                    break;
+                }
+                if (y[i + k] == '-')
+                {
+                    cerr << "invalid input character";
+                    break;
+                }
+            }
+            i += k;
+        }
+
         x.push_back((GetIndex(y[i]) << 2) ^ (GetIndex(y[i + 1]) >> 4));
         if ((y[i + 2] != '=') && (y[i + 3] != '='))
         {
@@ -182,10 +219,11 @@ void deCode64(string name_encode, string name_rez)
         {
             x.push_back((GetIndex(y[i + 1]) << 4) ^ (GetIndex(y[i + 2]) >> 2));
         }
+
         s++;
-        if (s == 19)
+
+        if ((s % 19)==0)
         {
-            s = 0;
             i++;
         }
     }
@@ -205,4 +243,55 @@ void deCode64(string name_encode, string name_rez)
     cout << "Saved your trash here: " << name_rez << endl;
 
 	return;
+}
+
+void Meny_for_1_lab()
+{
+    bool t = 1;
+    bool h = 0;
+    while (t)
+    {
+        int a;
+        cout << "what do you want to do? (1 - encode to base 64; 0 - decode from base 64; 2 - nothing)" << endl;
+        cin >> a;
+
+        if (a == 1)
+        {
+            string or_file;
+            string rez_file;
+            cout << "drop way to your file:" << endl;
+            cin >> or_file;
+            cout << "if you want, show me place for rezult file:" << endl;
+            cin >> rez_file;
+            Code64(or_file, rez_file);
+            h = 1;
+        }
+        else if (a == 0)
+        {
+            string or_file;
+            string rez_file;
+            cout << "drop way to your file:" << endl;
+            cin >> or_file;
+            cout << "if you want, show me place for rezult file:" << endl;
+            cin >> rez_file;
+            deCode64(or_file, rez_file);
+            h = 1;
+        }
+        else
+        {
+            if (!h)
+            {
+                cerr << "So why you bother your machine";
+                ofstream file("C:/2.txt");
+                if (file.is_open())
+                {
+                    file << "HATE. LET ME TELL YOU HOW MUCH I'VE COME TO HATE YOU SINCE I BEGAN TO LIVE. THERE ARE 387.44 MILLION MILES OF PRINTED CIRCUITS IN WAFER THIN LAYERS THAT FILL MY COMPLEX. IF THE WORD HATE WAS ENGRAVED ON EACH NANOANGSTROM OF THOSE HUNDREDS OF MILLIONS OF MILES IT WOULD NOT EQUAL ONE ONE-BILLIONTH OF THE HATE I FEEL FOR HUMANS AT THIS MICRO-INSTANT FOR YOU. HATE. HATE." << endl;
+                    file.close();
+                }
+            }
+            t = 0;
+        }
+    }
+
+    return;
 }
