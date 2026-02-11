@@ -5,7 +5,17 @@ vector<char> Alphabetius = {
     'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
     'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
     'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
-    '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+', '\\' };
+    '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+', '/' };
+
+int GetIndex(char c)
+{
+    if (c >= 'A' && c <= 'Z') return c - 'A';
+    if (c >= 'a' && c <= 'z') return c - 'a' + 26;
+    if (c >= '0' && c <= '9') return c - '0' + 52;
+    if (c == '+') return 62;
+    if (c == '/') return 63;
+    return 0;
+}
 
 void Code64(string name_orig, string name_encode)
 {
@@ -15,40 +25,40 @@ void Code64(string name_orig, string name_encode)
     }
 
     //відкриття файлу
-	std::ifstream file(name_orig, std::ios::binary | std::ios::ate);
+	ifstream file(name_orig, ios::binary | ios::ate);
 
     if (!file.is_open())
     {
-        std::cerr << "Womp womp, no such file" << std::endl;
+        cerr << "Womp womp, no such file" << endl;
         return;
     }
 
     // 2. Визначаємо розмір файлу
-    std::streamsize size = file.tellg();
-    file.seekg(0, std::ios::beg);
+    streamsize size = file.tellg();
+    file.seekg(0, ios::beg);
 
     // 3. Створюємо буфер потрібного розміру
-    std::vector<char> x(size);
+    vector<char> x(size);
 
     // 4. Читаємо дані
-    // read приймає (char*, кількість_байтів)
     if (file.read(x.data(), size)) 
     {
-        std::cout << "Read everything" << std::endl;
+        cout << "Read everything" << endl;
     }
     else 
     {
-        std::cerr << "Smt went wrong with reading" << std::endl;
+        cerr << "Smt went wrong with reading" << endl;
         file.close();
     }
     file.close();
 
     //робота з даними файлу
-    int new_size = ((size + 2) / 3) * 4;;
+    int new_size = ((size + 2) / 3) * 4;
 
     //створюємо новий буфер для закодованого тексту
     vector<char> y;
-    y.reserve(new_size);
+    y.reserve(new_size + (new_size / 76));
+    int l = 0;
     for (int i = 0; i < size; i=i+3)
     {
         unsigned char b1 = (unsigned char)x[i];
@@ -83,29 +93,116 @@ void Code64(string name_orig, string name_encode)
         {
             y.push_back('=');
         }
+
+        l += 4;
+        if (l >= 76)
+        {
+            y.push_back('\n');
+            l = 0;
+        }
     }
 
 
     // запис у файл
-    std::ofstream outputFile(name_encode, std::ios::binary);
+    ofstream outputFile(name_encode, ios::binary);
 
     if (!outputFile) 
     {
-        std::cerr << "Smt went wrong with final file" << std::endl;
+        cerr << "Smt went wrong with final file" << endl;
         return;
     }
 
-    // Записуємо весь змінений буфер за один раз
+    //записуємо весь змінений буфер за один раз
     outputFile.write(y.data(), y.size());
 
     outputFile.close();
-    std::cout << "Saved your trash here: " << name_encode << std::endl;
+    cout << "Saved your trash here: " << name_encode << endl;
 
 	return;
 }
 
 void deCode64(string name_encode, string name_rez)
 {
+    if (!(name_encode.ends_with(".base64")))
+    {
+        cerr << "This is not base64 encoded file.";
+    }
+
+    //відкриття файлу
+    ifstream file(name_encode, ios::binary | ios::ate);
+
+    if (!file.is_open())
+    {
+        cerr << "Womp womp, no such file" << endl;
+        return;
+    }
+
+    // 2. Визначаємо розмір файлу
+    streamsize size = file.tellg();
+    file.seekg(0, ios::beg);
+
+    /*if ((size & 3) > 0)
+    {
+        cerr << "the file is damaged" << endl;
+    }*/
+
+    // 3. Створюємо буфер потрібного розміру
+    vector<char> y(size);
+
+    // 4. Читаємо дані
+    if (file.read(y.data(), size))
+    {
+        cout << "Read everything" << endl;
+    }
+    else
+    {
+        cerr << "Smt went wrong with reading" << endl;
+        file.close();
+    }
+    file.close();
+
+    int new_size = (size / 4) * 3;
+    vector<char> x;
+    x.reserve(new_size);
+
+    int s = 0;
+    for (int i = 0; i < size; i += 4)
+    {
+        x.push_back((GetIndex(y[i]) << 2) ^ (GetIndex(y[i + 1]) >> 4));
+        if ((y[i + 2] != '=') && (y[i + 3] != '='))
+        {
+            x.push_back((GetIndex(y[i + 1]) << 4) ^ (GetIndex(y[i + 2]) >> 2));
+            x.push_back((GetIndex(y[i + 2]) << 6) ^ GetIndex(y[i + 3]));
+        }
+        else if (y[i + 2] == '=')
+        {
+            break;
+        }
+        else
+        {
+            x.push_back((GetIndex(y[i + 1]) << 4) ^ (GetIndex(y[i + 2]) >> 2));
+        }
+        s++;
+        if (s == 19)
+        {
+            s = 0;
+            i++;
+        }
+    }
+
+    ofstream outputFile(name_rez, ios::binary);
+
+    if (!outputFile)
+    {
+        cerr << "Smt went wrong with final file" << endl;
+        return;
+    }
+
+    //записуємо весь змінений буфер за один раз
+    outputFile.write(x.data(), x.size());
+
+    outputFile.close();
+    cout << "Saved your trash here: " << name_rez << endl;
 
 	return;
 }
