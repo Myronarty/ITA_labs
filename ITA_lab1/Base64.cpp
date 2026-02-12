@@ -129,6 +129,12 @@ void deCode64(string name_encode, string name_rez)
         cerr << "This is not base64 encoded file.";
     }
 
+    if (name_rez == "")
+    {
+        string temp = name_encode;
+        name_rez = temp.erase(temp.length() - 7);
+    }
+
     //відкриття файлу
     ifstream file(name_encode, ios::binary | ios::ate);
 
@@ -164,14 +170,12 @@ void deCode64(string name_encode, string name_rez)
     int s = 0;
     for (uint64_t i = 0; i < size; i += 4)
     {
-        //cout << i << endl;
         //comments
         if (y[i] == '-')
         {
             int k = 1;
             while (y[i + k] != '\n' || i + k >= size)
             {
-                cout << k << " __ " << endl;
                 if (k > 75)
                 {
                     cerr << "Too big comment" << endl;
@@ -187,6 +191,7 @@ void deCode64(string name_encode, string name_rez)
             i += k-3; //невілюємо стрибок на 4 вперед
             continue;
         }
+
         //errors
         for (int e = 0; e < 4; e++)
         {
@@ -267,6 +272,10 @@ void Meny_for_1_lab()
             cin >> or_file;
             cout << "if you want, show me place for rezult file:" << endl;
             cin >> rez_file;
+            if (rez_file == "-")
+            {
+                rez_file = "";
+            }
             Code64(or_file, rez_file);
             h = 1;
         }
@@ -278,6 +287,10 @@ void Meny_for_1_lab()
             cin >> or_file;
             cout << "if you want, show me place for rezult file:" << endl;
             cin >> rez_file;
+            if (rez_file == "-")
+            {
+                rez_file = "";
+            }
             deCode64(or_file, rez_file);
             h = 1;
         }
