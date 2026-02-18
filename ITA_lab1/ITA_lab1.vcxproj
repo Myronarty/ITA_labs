@@ -129,9 +129,11 @@
   <ItemGroup>
     <ClCompile Include="Base64.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="RLE.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Base64.h" />
+    <ClInclude Include="RLE.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
