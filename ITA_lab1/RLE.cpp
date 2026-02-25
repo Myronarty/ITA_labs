@@ -25,7 +25,7 @@ void CodeRLE(string name_orig, string name_encode)
     int t = 1;
     for (int i = 0; i < size; i++)
     {
-        if (i + 1 < size && x[i] == x[i + 1] && t < 63)
+        if (i + 1 < size && x[i] == x[i + 1] && t < 64)
         {
             t++;
         }
@@ -35,11 +35,11 @@ void CodeRLE(string name_orig, string name_encode)
             {
                 if (x[i] & 0x80)
                 {
-                    y.push_back(static_cast<uint8_t>(t | 0xC0));
+                    y.push_back(static_cast<uint8_t>((t-1) | 0xC0));
                 }
                 else
                 {
-                    y.push_back(static_cast<uint8_t>(t | 0x80));
+                    y.push_back(static_cast<uint8_t>((t - 1) | 0x80));
                 }
                 y.push_back(x[i] & 0x7F);
             }
@@ -102,7 +102,7 @@ void deCodeRLE(string name_encode, string name_rez)
                     d |= 0x80;
                 }
 
-                for (int j = 0; j < (y[i] & 0x3F); j++)
+                for (int j = 0; j < (y[i] & 0x3F)+1; j++)
                 {
                     x.push_back(d);
                 }
