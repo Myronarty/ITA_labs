@@ -27,6 +27,9 @@
     <ClCompile Include="Bit_Work.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Huff.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Base64.h">
@@ -36,6 +39,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Bit_Work.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Huff.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

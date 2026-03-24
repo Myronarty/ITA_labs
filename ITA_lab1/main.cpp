@@ -1,6 +1,7 @@
 #include "RLE.h"
 #include "Base64.h"
 #include "Bit_Work.h"
+#include "Huff.h"
 
 void Meny_for_1_lab()
 {
@@ -63,18 +64,8 @@ void Meny_for_1_lab()
 
 int main()
 {
-	//Meny_for_1_lab();
-
-    std::fstream myFile("D:/problems/term_6/ITA/lab_1/test_subjects/data.bin", std::ios::binary | std::ios::in | std::ios::out | std::ios::trunc);
-    //fstream myFile("D:/problems/term_6/ITA/lab_1/test_subjects/data.bin", ios::binary | ios::in);
-    BitWorker worker(myFile);
-
-    worker.WriteBitSequence(0b0110010001101010, 16);
-    worker.flush();
-    myFile.seekg(0);
-    string result = "";
-    worker.ReadBitSequence(result, 16);
-    cout << result;
+    CodeHuffman("D:/problems/term_6/ITA/lab_1/test_subjects/im67.jpg", "D:/problems/term_6/ITA/lab_1/test_subjects/im67.jpg.huff");
+    deCodeHuffman("D:/problems/term_6/ITA/lab_1/test_subjects/im67.jpg.huff", "D:/problems/term_6/ITA/lab_1/test_subjects/im67__.jpg");
 
 	return 0;
 }
