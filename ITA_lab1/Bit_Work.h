@@ -23,5 +23,7 @@ struct BitWorker
 
     void WriteBitSequence(uint64_t a, int b);
 
+    bool ReadBits(uint32_t& code, int bits_needed);
+
     void flush();
 };

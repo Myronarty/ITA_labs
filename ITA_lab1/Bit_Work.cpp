@@ -46,6 +46,35 @@ void BitWorker::WriteBitSequence(uint64_t a, int b)
     }
 }
 
+bool BitWorker::ReadBits(uint32_t& code, int bits_needed)
+{
+    uint32_t temp_code = 0;
+    int bits_left_to_read = bits_needed;
+
+    while (bits_left_to_read > 0)
+    {
+        if (r_bit_count == 0)
+        {
+            char ch;
+            if (!file.get(ch)) return false;
+            r_buffer = static_cast<uint8_t>(ch);
+            r_bit_count = 8;
+        }
+
+        int bits_to_take = min(bits_left_to_read, r_bit_count);
+        uint8_t mask = (1 << bits_to_take) - 1;
+        uint8_t shift = r_bit_count - bits_to_take;
+
+        uint8_t bits = (r_buffer >> shift) & mask;
+        temp_code = (temp_code << bits_to_take) | bits;
+
+        r_bit_count -= bits_to_take;
+        bits_left_to_read -= bits_to_take;
+    }
+    code = temp_code;
+    return true;
+}
+
 void BitWorker::flush()
 {
     if (bit_count > 0)

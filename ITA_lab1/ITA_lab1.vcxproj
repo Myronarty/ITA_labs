@@ -130,6 +130,7 @@
     <ClCompile Include="Base64.cpp" />
     <ClCompile Include="Bit_Work.cpp" />
     <ClCompile Include="Huff.cpp" />
+    <ClCompile Include="LZW.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="RLE.cpp" />
   </ItemGroup>
@@ -137,6 +138,7 @@
     <ClInclude Include="Base64.h" />
     <ClInclude Include="Bit_Work.h" />
     <ClInclude Include="Huff.h" />
+    <ClInclude Include="LZW.h" />
     <ClInclude Include="RLE.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
