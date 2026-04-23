@@ -132,7 +132,9 @@
     <ClCompile Include="Huff.cpp" />
     <ClCompile Include="LZW.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="over_funcs.cpp" />
     <ClCompile Include="RLE.cpp" />
+    <ClCompile Include="Transform.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Base64.h" />
@@ -140,6 +142,7 @@
     <ClInclude Include="Huff.h" />
     <ClInclude Include="LZW.h" />
     <ClInclude Include="RLE.h" />
+    <ClInclude Include="Transform.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

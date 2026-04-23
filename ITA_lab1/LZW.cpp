@@ -22,19 +22,16 @@ void CodeLZW(string name_orig, string name_encode, uint8_t max_bits)
     BitWorker bw(outFile);
     uint32_t d_size = 1 << max_bits;
 
-    map<vector<uint8_t>, uint32_t> dictionary;
-    for (uint32_t i = 0; i < 256; i++)
-    {
-        dictionary[{static_cast<uint8_t>(i)}] = i;
-    }
+    unordered_map<uint64_t, uint32_t> dictionary;
+
     uint32_t next_code = 256;
 
-    vector<uint8_t> S;
+    uint32_t current_code;
     uint8_t c;
 
     if (inFile.read(reinterpret_cast<char*>(&c), 1))
     {
-        S.push_back(c);
+        current_code = c;
     }
     else
     {
@@ -42,31 +39,30 @@ void CodeLZW(string name_orig, string name_encode, uint8_t max_bits)
         outFile.close();
         return;
     }
+
     while (inFile.read(reinterpret_cast<char*>(&c), 1))
     {
-        vector<uint8_t> Sc = S;
-        Sc.push_back(c);
+        uint64_t combined_key = (static_cast<uint64_t>(current_code) << 8) | c;
 
-        if (dictionary.count(Sc))
+        auto it = dictionary.find(combined_key);
+        if (it != dictionary.end())
         {
-            S = Sc;
+            current_code = it->second;
         }
         else
         {
-            uint32_t I = dictionary[S];
-            bw.WriteBitSequence(I, max_bits);
+            bw.WriteBitSequence(current_code, max_bits);
 
             if (next_code < d_size)
             {
-                dictionary[Sc] = next_code++;
+                dictionary[combined_key] = next_code++;
             }
-            
-            S = { c };
+
+            current_code = c;
         }
     }
 
-    uint32_t I = dictionary[S];
-    bw.WriteBitSequence(I, max_bits);
+    bw.WriteBitSequence(current_code, max_bits);
     bw.flush();
 
     inFile.close();

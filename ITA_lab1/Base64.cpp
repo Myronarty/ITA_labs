@@ -46,7 +46,7 @@ void Code64(string name_orig, string name_encode)
     {
         cout << "Read everything" << endl;
     }
-    else 
+    else
     {
         cerr << "Smt went wrong with reading" << endl;
         file.close();

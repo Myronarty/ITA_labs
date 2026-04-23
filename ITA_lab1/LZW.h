@@ -3,7 +3,7 @@
 #include <fstream>
 #include <vector>
 #include <string>
-#include <map>
+#include <unordered_map>
 #include "Bit_Work.h"
 
 using namespace std;
