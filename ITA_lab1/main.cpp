@@ -5,8 +5,102 @@
 #include "LZW.h"
 #include "Transform.h"
 #include <functional>
+#include "Blum.h"
 
 using namespace std;
+
+string random_string(int len)
+{
+    static const string chars =
+        "abcdefghijklmnopqrstuvwxyz";
+
+    random_device rd;
+    mt19937 gen(rd());
+    uniform_int_distribution<> dist(0, chars.size() - 1);
+
+    string s;
+    for (int i = 0; i < len; i++)
+    {
+        s += chars[dist(gen)];
+    }
+
+    return s;
+}
+
+double run_experiment(double alpha, int s)
+{
+    const int N = 1 << 16;
+    int n = alpha * N;
+
+    BloomFilter bf(s);
+
+    // додаємо
+    for (int i = 0; i < n; i++)
+    {
+        bf.add(random_string(rand() % 100 + 1));
+    }
+
+    // шукаємо першу помилку
+    int M = 0;
+
+    while (true)
+    {
+        string test = random_string(rand() % 100 + 1);
+        M++;
+
+        if (bf.contains(test))
+        {
+            return 1.0 / M;
+        }
+    }
+}
+
+int main()
+{
+    vector<double> alphas =
+    {
+        0.05, 0.10, 0.15, 0.20, 0.25,
+        0.30, 0.35, 0.40, 0.45, 0.50
+    };
+
+    vector<int> s_values = { 3, 4, 5, 6, 7 };
+
+    cout << fixed << setprecision(6);
+
+    const int W1 = 10;
+    const int W2 = 14;
+
+    // 🔹 header
+    cout << setw(W1) << "alpha\\s";
+    for (int s : s_values)
+    {
+        cout << setw(W2) << s;
+    }
+    cout << endl;
+
+    for (double alpha : alphas)
+    {
+        cout << setw(W1) << fixed << setprecision(2) << alpha;
+
+        for (int s : s_values)
+        {
+            double avg = 0.0;
+
+            for (int i = 0; i < 100; i++)
+            {
+                avg += run_experiment(alpha, s);
+            }
+
+            avg /= 100.0;
+
+            cout << setw(W2) << fixed << setprecision(6) << avg;
+        }
+
+        cout << endl;
+    }
+
+	return 0;
+}
 
 void Meny_for_1_lab()
 {
@@ -166,7 +260,7 @@ void ProcessBatchGeneric(string base_dir_path, string folder_suffix, string file
                     string output_file = (out_folder_path / (filename + file_ext)).string();
 
                     cout << "  - Encoding: " << filename << " ... \n";
-                    
+
                     encode_func(input_file, output_file);
                 }
             }
@@ -203,17 +297,4 @@ void ProcessBatch_BWT_MTF_Huffman(string base_dir)
 void ProcessBatch_BWT_MTF_LZW(string base_dir)
 {
     ProcessBatchGeneric(base_dir, "_bml", ".bml", [](string in, string out) { Code_BWT_MTF_LZW(in, out, 12); });
-}
-
-int main()
-{
-    string a = "D:/problems/term_6/ITA/lab_5";
-    //ProcessBatch_BWT_LZW(a);
-    ProcessBatch_BWT_Huffman(a);
-    ProcessBatch_MTF_Huffman(a);
-    ProcessBatch_MTF_LZW(a);
-    ProcessBatch_BWT_MTF_Huffman(a);
-    ProcessBatch_BWT_MTF_LZW(a);
-
-	return 0;
 }
